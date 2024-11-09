@@ -3,10 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
+
+import { IdParamDto } from '../common/dto/idParam.dto';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
@@ -26,17 +29,26 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.artistService.findOne(+id);
+  findOne(@Param() { id }: IdParamDto) {
+    const artist = this.artistService.findOne(id);
+
+    if (!artist) {
+      throw new NotFoundException('Artist not found');
+    }
+
+    return artist;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    return this.artistService.update(+id, updateArtistDto);
+  @Put(':id')
+  update(
+    @Param() { id }: IdParamDto,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
+    return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.artistService.remove(+id);
+  remove(@Param() { id }: IdParamDto) {
+    return this.artistService.remove(id);
   }
 }
