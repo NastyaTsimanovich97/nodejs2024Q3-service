@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
 import { v4 as uuidv4 } from 'uuid';
 import { ArtistService } from '../artist/artist.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -21,7 +22,7 @@ export class AlbumService {
       year: 2018,
     },
     {
-      id: '18b2123c-4a20-4138-9d00-4f89eb06d5ac',
+      id: '48b2123c-4a20-4138-9d00-4f89eb06d5ac',
       name: 'Some Girls',
       artistId: 'c3f9f2a5-9f9e-4e9d-9e9d-9f9e4e9d2a5c',
       year: 1978,
@@ -51,6 +52,12 @@ export class AlbumService {
 
   findOne(id: string): AlbumEntity {
     return this.albums.find((album) => album.id === id);
+  }
+
+  findOneByArtistAndAlbum(id: string, artistId: string): AlbumEntity {
+    return this.albums.find(
+      (album) => album.id === id && album.artistId === artistId,
+    );
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto): AlbumEntity {

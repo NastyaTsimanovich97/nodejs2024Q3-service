@@ -7,5 +7,6 @@ import { AlbumController } from './album.controller';
   imports: [ArtistModule],
   controllers: [AlbumController],
   providers: [AlbumService],
+  exports: [AlbumService],
 })
 export class AlbumModule {}
