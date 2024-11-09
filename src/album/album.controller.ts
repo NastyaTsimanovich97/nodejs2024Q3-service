@@ -3,10 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  NotFoundException,
+  Put,
 } from '@nestjs/common';
+
+import { IdParamDto } from '../common/dto/idParam.dto';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
@@ -26,17 +29,23 @@ export class AlbumController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.albumService.findOne(+id);
+  findOne(@Param() { id }: IdParamDto) {
+    const album = this.albumService.findOne(id);
+
+    if (!album) {
+      throw new NotFoundException('Album not found');
+    }
+
+    return album;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
-    return this.albumService.update(+id, updateAlbumDto);
+  @Put(':id')
+  update(@Param() { id }: IdParamDto, @Body() updateAlbumDto: UpdateAlbumDto) {
+    return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.albumService.remove(+id);
+  remove(@Param() { id }: IdParamDto) {
+    return this.albumService.remove(id);
   }
 }
