@@ -4,6 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import configuration from './common/config/configuration';
 import { UserModule } from './user/user.module';
+import { TrackModule } from './track/track.module';
+import { ArtistModule } from './artist/artist.module';
+import { AlbumModule } from './album/album.module';
+import { FavsModule } from './favs/favs.module';
 
 @Module({
   imports: [
@@ -13,6 +17,10 @@ import { UserModule } from './user/user.module';
       load: [configuration],
     }),
     UserModule,
+    TrackModule,
+    ArtistModule,
+    AlbumModule,
+    FavsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
