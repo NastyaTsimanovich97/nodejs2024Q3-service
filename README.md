@@ -4,11 +4,12 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Node version = 22.x.x
 
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone [{repository URL}](https://github.com/NastyaTsimanovich97/nodejs2024Q3-service.git)
 ```
 
 ## Installing NPM modules
@@ -18,9 +19,15 @@ npm install
 ```
 
 ## Running application
+Create .env file in the root and copy .env.example to .env
 
 ```
 npm start
+```
+
+Start application in development mode
+```
+npm start:dev 
 ```
 
 After starting the app on port (4000 as default) you can open
