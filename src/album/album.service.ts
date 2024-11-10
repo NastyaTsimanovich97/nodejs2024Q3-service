@@ -1,18 +1,26 @@
 import {
-  BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { v4 as uuidv4 } from 'uuid';
-import { ArtistService } from '../artist/artist.service';
+
+import { FavsService } from '../favs/favs.service';
+import { TrackService } from '../track/track.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumEntity } from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly artistService: ArtistService) {}
+  constructor(
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
 
   private albums: AlbumEntity[] = [
     {
@@ -35,42 +43,30 @@ export class AlbumService {
       ...createAlbumDto,
     };
 
-    const isArtistExist = this.checkArtist(createAlbumDto.artistId);
-
-    if (!isArtistExist) {
-      throw new BadRequestException('Artist does not exist');
-    }
-
     this.albums.push(createdAlbum);
 
     return createdAlbum;
   }
 
-  findAll(): AlbumEntity[] {
+  getAll(): AlbumEntity[] {
     return this.albums;
   }
 
-  findOne(id: string): AlbumEntity {
+  getById(id: string): AlbumEntity {
     return this.albums.find((album) => album.id === id);
   }
 
-  findOneByArtistAndAlbum(id: string, artistId: string): AlbumEntity {
+  getOneByArtistAndAlbum(id: string, artistId: string): AlbumEntity {
     return this.albums.find(
       (album) => album.id === id && album.artistId === artistId,
     );
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto): AlbumEntity {
-    const albumRecord = this.findOne(id);
+    const albumRecord = this.getById(id);
 
     if (!albumRecord) {
       throw new NotFoundException('Album not found');
-    }
-
-    const isArtistExist = this.checkArtist(updateAlbumDto.artistId);
-
-    if (updateAlbumDto.artistId && !isArtistExist) {
-      throw new BadRequestException('Artist does not exist');
     }
 
     const updatedAlbum = {
@@ -85,8 +81,8 @@ export class AlbumService {
     return updatedAlbum;
   }
 
-  remove(id: string) {
-    const albumRecord = this.findOne(id);
+  delete(id: string): string {
+    const albumRecord = this.getById(id);
 
     if (!albumRecord) {
       throw new NotFoundException('Album not found');
@@ -94,10 +90,19 @@ export class AlbumService {
 
     this.albums = this.albums.filter((album) => album.id !== id);
 
+    this.trackService.deleteByAlbumId(id);
+    this.favsService.addAlbum(id);
+
     return `Album ${id} is removed`;
   }
 
-  private checkArtist(artistId: string): boolean {
-    return !!this.artistService.findOne(artistId);
+  deleteByArtistId(artistId: string): void {
+    this.albums = this.albums.map((album) => {
+      if (album.artistId === artistId) {
+        return { ...album, artistId: null };
+      }
+
+      return album;
+    });
   }
 }

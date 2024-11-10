@@ -7,6 +7,7 @@ import {
   Delete,
   NotFoundException,
   Put,
+  HttpCode,
 } from '@nestjs/common';
 
 import { IdParamDto } from '../common/dto/idParam.dto';
@@ -24,13 +25,13 @@ export class ArtistController {
   }
 
   @Get()
-  findAll() {
-    return this.artistService.findAll();
+  getAll() {
+    return this.artistService.getAll();
   }
 
   @Get(':id')
-  findOne(@Param() { id }: IdParamDto) {
-    const artist = this.artistService.findOne(id);
+  getById(@Param() { id }: IdParamDto) {
+    const artist = this.artistService.getById(id);
 
     if (!artist) {
       throw new NotFoundException('Artist not found');
@@ -48,7 +49,8 @@ export class ArtistController {
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdParamDto) {
-    return this.artistService.remove(id);
+  @HttpCode(204)
+  delete(@Param() { id }: IdParamDto) {
+    return this.artistService.delete(id);
   }
 }

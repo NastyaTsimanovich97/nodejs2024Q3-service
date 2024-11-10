@@ -6,6 +6,7 @@ import {
   Delete,
   UnprocessableEntityException,
   NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 
 import { IdParamDto } from '../common/dto/idParam.dto';
@@ -16,8 +17,8 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Get()
-  findAll() {
-    return this.favsService.findAll();
+  getAll() {
+    return this.favsService.getAll();
   }
 
   @Post('track/:id')
@@ -32,8 +33,9 @@ export class FavsController {
   }
 
   @Delete('track/:id')
-  removeTrack(@Param() { id }: IdParamDto) {
-    const result = this.favsService.removeTrack(id);
+  @HttpCode(204)
+  deleteTrack(@Param() { id }: IdParamDto) {
+    const result = this.favsService.deleteTrack(id);
 
     if (!result) {
       throw new NotFoundException('Track is not favorite');
@@ -54,8 +56,9 @@ export class FavsController {
   }
 
   @Delete('album/:id')
-  removeAlbum(@Param() { id }: IdParamDto) {
-    const result = this.favsService.removeAlbum(id);
+  @HttpCode(204)
+  deleteAlbum(@Param() { id }: IdParamDto) {
+    const result = this.favsService.deleteAlbum(id);
 
     if (!result) {
       throw new NotFoundException('Album is not favorite');
@@ -76,8 +79,9 @@ export class FavsController {
   }
 
   @Delete('artist/:id')
-  removeArtist(@Param() { id }: IdParamDto) {
-    const result = this.favsService.removeArtist(id);
+  @HttpCode(204)
+  deleteArtist(@Param() { id }: IdParamDto) {
+    const result = this.favsService.deleteArtist(id);
 
     if (!result) {
       throw new NotFoundException('Artist is not favorite');

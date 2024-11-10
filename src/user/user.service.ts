@@ -36,16 +36,16 @@ export class UserService {
     return userData;
   }
 
-  findAll(): UserEntity[] {
+  getAll(): UserEntity[] {
     return this.users;
   }
 
-  findOne(id: string): UserEntity {
+  getById(id: string): UserEntity {
     return this.users.find((user) => user.id === id);
   }
 
   update(id: string, updateUserDto: UpdatePasswordDto): UserEntity {
-    const updatedUserRecord = this.findOne(id);
+    const updatedUserRecord = this.getById(id);
 
     if (!updatedUserRecord) {
       throw new NotFoundException('User not found');
@@ -57,6 +57,7 @@ export class UserService {
 
     const updatedUser = {
       ...updatedUserRecord,
+      version: updatedUserRecord.version + 1,
       updatedAt: new Date().getTime(),
       password: updateUserDto.newPassword,
     };
@@ -68,8 +69,8 @@ export class UserService {
     return updatedUser;
   }
 
-  remove(id: string): string {
-    const removedUserRecord = this.findOne(id);
+  delete(id: string): string {
+    const removedUserRecord = this.getById(id);
 
     if (!removedUserRecord) {
       throw new NotFoundException('User not found');

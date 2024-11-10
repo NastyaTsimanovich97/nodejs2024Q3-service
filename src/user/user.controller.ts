@@ -10,6 +10,7 @@ import {
   SerializeOptions,
   UseInterceptors,
   ClassSerializerInterceptor,
+  HttpCode,
 } from '@nestjs/common';
 
 import { ApiBody } from '@nestjs/swagger';
@@ -35,15 +36,15 @@ export class UserController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   @SerializeOptions({ type: UserEntity })
-  findAll(): UserEntity[] {
-    return this.userService.findAll();
+  getAll(): UserEntity[] {
+    return this.userService.getAll();
   }
 
   @Get(':id')
   @UseInterceptors(ClassSerializerInterceptor)
   @SerializeOptions({ type: UserEntity })
-  findOne(@Param() { id }: IdParamDto) {
-    const user = this.userService.findOne(id);
+  getById(@Param() { id }: IdParamDto) {
+    const user = this.userService.getById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -63,7 +64,8 @@ export class UserController {
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdParamDto) {
-    return this.userService.remove(id);
+  @HttpCode(204)
+  delete(@Param() { id }: IdParamDto) {
+    return this.userService.delete(id);
   }
 }

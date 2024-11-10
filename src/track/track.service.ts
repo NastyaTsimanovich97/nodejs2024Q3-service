@@ -1,14 +1,17 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { AlbumService } from '../album/album.service';
 
+import { FavsService } from '../favs/favs.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly albumService: AlbumService) {}
+  constructor(
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
 
   private tracks: TrackEntity[] = [
     {
@@ -33,30 +36,21 @@ export class TrackService {
       ...createTrackDto,
     };
 
-    const isAlbumExist = this.checkAlbum(
-      createTrackDto.albumId,
-      createTrackDto.artistId,
-    );
-
-    if (!isAlbumExist) {
-      throw new BadRequestException('Album does not exist');
-    }
-
     this.tracks.push(newTrack);
 
     return newTrack;
   }
 
-  findAll(): TrackEntity[] {
+  getAll(): TrackEntity[] {
     return this.tracks;
   }
 
-  findOne(id: string): TrackEntity {
+  getById(id: string): TrackEntity {
     return this.tracks.find((track) => track.id === id);
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto): TrackEntity | null {
-    const trackRecord = this.findOne(id);
+    const trackRecord = this.getById(id);
 
     if (!trackRecord) {
       return null;
@@ -67,15 +61,6 @@ export class TrackService {
       ...updateTrackDto,
     };
 
-    const isAlbumExist = this.checkAlbum(
-      updateTrackDto.albumId,
-      updateTrackDto.artistId,
-    );
-
-    if (updateTrackDto.albumId && updateTrackDto.artistId && !isAlbumExist) {
-      throw new BadRequestException('Album does not exist');
-    }
-
     this.tracks = this.tracks.map((track) =>
       track.id === id ? updatedTrack : track,
     );
@@ -83,8 +68,8 @@ export class TrackService {
     return updatedTrack;
   }
 
-  remove(id: string): string | null {
-    const trackRecord = this.findOne(id);
+  delete(id: string): string | null {
+    const trackRecord = this.getById(id);
 
     if (!trackRecord) {
       return null;
@@ -92,10 +77,27 @@ export class TrackService {
 
     this.tracks = this.tracks.filter((track) => track.id !== id);
 
+    this.favsService.deleteTrack(id);
+
     return `Track ${id} is removed`;
   }
 
-  private checkAlbum(albumId: string, artistId: string): boolean {
-    return !!this.albumService.findOneByArtistAndAlbum(albumId, artistId);
+  deleteByArtistId(artistId: string): void {
+    this.tracks = this.tracks.map((track) => {
+      if (track.artistId === artistId) {
+        return { ...track, artistId: null };
+      }
+
+      return track;
+    });
+  }
+
+  deleteByAlbumId(albumId: string): void {
+    this.tracks = this.tracks.map((track) => {
+      if (track.albumId === albumId) {
+        return { ...track, albumId: null };
+      }
+      return track;
+    });
   }
 }

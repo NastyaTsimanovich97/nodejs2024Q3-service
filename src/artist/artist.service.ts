@@ -1,11 +1,28 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { v4 as uuidv4 } from 'uuid';
+import { AlbumService } from '../album/album.service';
+import { TrackService } from '../track/track.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistEntity } from './entities/artist.entity';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class ArtistService {
+  constructor(
+    private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => TrackService))
+    private readonly trackService: TrackService,
+    @Inject(forwardRef(() => FavsService))
+    private readonly favsService: FavsService,
+  ) {}
+
   private artists: ArtistEntity[] = [
     {
       id: '8cd4e165-954c-4268-ad5c-0f13ba0188ec',
@@ -30,16 +47,16 @@ export class ArtistService {
     return createdArtist;
   }
 
-  findAll(): ArtistEntity[] {
+  getAll(): ArtistEntity[] {
     return this.artists;
   }
 
-  findOne(id: string): ArtistEntity {
+  getById(id: string): ArtistEntity {
     return this.artists.find((artist) => artist.id === id);
   }
 
   update(id: string, updateArtistDto: UpdateArtistDto): ArtistEntity {
-    const updatedArtistRecord = this.findOne(id);
+    const updatedArtistRecord = this.getById(id);
 
     if (!updatedArtistRecord) {
       throw new NotFoundException('Artist not found');
@@ -57,14 +74,18 @@ export class ArtistService {
     return updatedArtist;
   }
 
-  remove(id: string): string {
-    const removedArtistRecord = this.findOne(id);
+  delete(id: string): string {
+    const removedArtistRecord = this.getById(id);
 
     if (!removedArtistRecord) {
       throw new NotFoundException('Artist not found');
     }
 
     this.artists = this.artists.filter((artist) => artist.id !== id);
+
+    this.albumService.deleteByArtistId(id);
+    this.trackService.deleteByArtistId(id);
+    this.favsService.deleteArtist(id);
 
     return `Artist ${id} is removed`;
   }

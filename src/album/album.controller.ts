@@ -7,6 +7,7 @@ import {
   Delete,
   NotFoundException,
   Put,
+  HttpCode,
 } from '@nestjs/common';
 
 import { IdParamDto } from '../common/dto/idParam.dto';
@@ -24,13 +25,13 @@ export class AlbumController {
   }
 
   @Get()
-  findAll() {
-    return this.albumService.findAll();
+  getAll() {
+    return this.albumService.getAll();
   }
 
   @Get(':id')
-  findOne(@Param() { id }: IdParamDto) {
-    const album = this.albumService.findOne(id);
+  getById(@Param() { id }: IdParamDto) {
+    const album = this.albumService.getById(id);
 
     if (!album) {
       throw new NotFoundException('Album not found');
@@ -45,7 +46,8 @@ export class AlbumController {
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdParamDto) {
-    return this.albumService.remove(id);
+  @HttpCode(204)
+  delete(@Param() { id }: IdParamDto) {
+    return this.albumService.delete(id);
   }
 }

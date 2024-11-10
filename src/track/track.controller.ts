@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   NotFoundException,
+  HttpCode,
 } from '@nestjs/common';
 
 import { IdParamDto } from '../common/dto/idParam.dto';
@@ -24,13 +25,13 @@ export class TrackController {
   }
 
   @Get()
-  findAll() {
-    return this.trackService.findAll();
+  getAll() {
+    return this.trackService.getAll();
   }
 
   @Get(':id')
-  findOne(@Param() { id }: IdParamDto) {
-    const result = this.trackService.findOne(id);
+  getById(@Param() { id }: IdParamDto) {
+    const result = this.trackService.getById(id);
 
     if (!result) {
       throw new NotFoundException('Track not found');
@@ -51,8 +52,9 @@ export class TrackController {
   }
 
   @Delete(':id')
-  remove(@Param() { id }: IdParamDto) {
-    const result = this.trackService.remove(id);
+  @HttpCode(204)
+  delete(@Param() { id }: IdParamDto) {
+    const result = this.trackService.delete(id);
 
     if (!result) {
       throw new NotFoundException('Track not found');

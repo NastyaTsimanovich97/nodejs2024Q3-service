@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
 import { TrackService } from '../track/track.service';
@@ -13,17 +13,20 @@ export class FavsService {
   };
 
   constructor(
+    @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
+    @Inject(forwardRef(() => ArtistService))
     private readonly artistService: ArtistService,
+    @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
   ) {}
 
-  findAll(): FavEntity {
+  getAll(): FavEntity {
     return this.favs;
   }
 
   addTrack(trackId: string): string {
-    const track = this.trackService.findOne(trackId);
+    const track = this.trackService.getById(trackId);
 
     if (!track) {
       return null;
@@ -38,7 +41,7 @@ export class FavsService {
     return `Track ${track.name} is added to favorites`;
   }
 
-  removeTrack(trackId: string): string {
+  deleteTrack(trackId: string): string {
     const track = this.favs.tracks.find((track) => track.id === trackId);
 
     if (!track) {
@@ -51,7 +54,7 @@ export class FavsService {
   }
 
   addAlbum(albumId: string): string {
-    const album = this.albumService.findOne(albumId);
+    const album = this.albumService.getById(albumId);
 
     if (!album) {
       return null;
@@ -66,7 +69,7 @@ export class FavsService {
     return `Album ${album.name} is added to favorites`;
   }
 
-  removeAlbum(albumId: string): string {
+  deleteAlbum(albumId: string): string {
     const album = this.favs.albums.find((album) => album.id === albumId);
 
     if (!album) {
@@ -79,7 +82,7 @@ export class FavsService {
   }
 
   addArtist(artistId: string): string {
-    const artist = this.artistService.findOne(artistId);
+    const artist = this.artistService.getById(artistId);
 
     if (!artist) {
       return null;
@@ -96,7 +99,7 @@ export class FavsService {
     return `Artist ${artist.name} is added to favorites`;
   }
 
-  removeArtist(artistId: string): string {
+  deleteArtist(artistId: string): string {
     const artist = this.favs.artists.find((artist) => artist.id === artistId);
 
     if (!artist) {
