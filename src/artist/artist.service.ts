@@ -1,14 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ArtistEntity } from './entities/artist.entity';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class ArtistService {
   constructor(
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
     @InjectRepository(ArtistEntity)
     private artistRepository: Repository<ArtistEntity>,
   ) {}
@@ -47,7 +56,7 @@ export class ArtistService {
       ...updateArtistDto,
     };
 
-    this.artistRepository.update({ id }, updatedArtist);
+    await this.artistRepository.update({ id }, updatedArtist);
 
     return updatedArtist;
   }
@@ -59,11 +68,8 @@ export class ArtistService {
       throw new NotFoundException('Artist not found');
     }
 
-    this.artistRepository.delete({ id });
-
-    // this.albumService.deleteByArtistId(id);
-    // this.trackService.deleteByArtistId(id);
-    // this.favsService.deleteArtist(id);
+    await this.favsService.deleteArtist(id);
+    await this.artistRepository.delete({ id });
 
     return `Artist ${id} is removed`;
   }

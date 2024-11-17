@@ -18,16 +18,20 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+  async create(createUserDto: CreateUserDto) {
     const userData = {
       id: uuidv4(),
       version: 1,
       ...createUserDto,
     };
 
-    await this.userRepository.save(userData);
+    const user = await this.userRepository.save(userData);
 
-    return userData;
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 
   async getAll(): Promise<UserEntity[]> {
@@ -38,10 +42,7 @@ export class UserService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdatePasswordDto,
-  ): Promise<UserEntity> {
+  async update(id: string, updateUserDto: UpdatePasswordDto) {
     const updatedUserRecord = await this.getById(id);
 
     if (!updatedUserRecord) {
@@ -52,15 +53,22 @@ export class UserService {
       throw new ForbiddenException('Password is not correct');
     }
 
-    const updatedUser = {
+    const updatedUserData = {
       ...updatedUserRecord,
+      updatedAt: new Date(),
       version: updatedUserRecord.version + 1,
       password: updateUserDto.newPassword,
     };
 
-    await this.userRepository.update({ id }, updatedUser);
+    await this.userRepository.update({ id }, updatedUserData);
 
-    return updatedUser;
+    const updatedUser = await this.getById(id);
+
+    return {
+      ...updatedUser,
+      createdAt: new Date(updatedUser.createdAt).getTime(),
+      updatedAt: new Date(updatedUser.updatedAt).getTime(),
+    };
   }
 
   async delete(id: string): Promise<string> {
@@ -70,7 +78,7 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    this.userRepository.delete({ id });
+    await this.userRepository.delete({ id });
 
     return `User ${id} is removed`;
   }

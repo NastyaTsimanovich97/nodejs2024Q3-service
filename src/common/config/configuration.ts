@@ -19,6 +19,6 @@ export default () =>
       cli: {
         migrationsDir: 'migrations',
       },
-      logging: true,
+      logging: false,
     },
   } as const);

@@ -11,8 +11,8 @@ export abstract class AbstractIdEntity {
 
 export abstract class AbstractEntity extends AbstractIdEntity {
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-  createdAt?: number;
+  createdAt?: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
-  updatedAt?: number;
+  updatedAt?: Date;
 }

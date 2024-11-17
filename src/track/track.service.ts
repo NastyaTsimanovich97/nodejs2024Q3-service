@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,10 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class TrackService {
   constructor(
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
   ) {}
@@ -37,7 +40,7 @@ export class TrackService {
     id: string,
     updateTrackDto: UpdateTrackDto,
   ): Promise<TrackEntity | null> {
-    const trackRecord = this.getById(id);
+    const trackRecord = await this.getById(id);
 
     if (!trackRecord) {
       return null;
@@ -54,13 +57,14 @@ export class TrackService {
   }
 
   async delete(id: string): Promise<string | null> {
-    const trackRecord = this.getById(id);
+    const trackRecord = await this.getById(id);
 
     if (!trackRecord) {
       return null;
     }
 
-    this.trackRepository.delete({ id });
+    await this.favsService.deleteTrack(id);
+    await this.trackRepository.delete({ id });
 
     return `Track ${id} is removed`;
   }

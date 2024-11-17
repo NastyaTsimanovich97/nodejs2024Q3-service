@@ -1,11 +1,11 @@
 import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
-import { AbstractEntity } from '../../common/entities/abstract.entity';
+import { AbstractIdEntity } from '../../common/entities/abstract.entity';
 import { AlbumEntity } from '../../album/entities/album.entity';
 import { TrackEntity } from '../../track/entities/track.entity';
 import { FavEntity } from '../../favs/entities/fav.entity';
 
 @Entity({ name: 'artist' })
-export class ArtistEntity extends AbstractEntity {
+export class ArtistEntity extends AbstractIdEntity {
   @Column()
   name: string;
 
