@@ -19,9 +19,22 @@ export class FavsService {
     private favsRepository: Repository<FavEntity>,
   ) {}
 
-  // TODO: update this method
-  async getAll(): Promise<FavEntity[]> {
-    return this.favsRepository.find();
+  async getAll(): Promise<FavEntity> {
+    const records = await this.favsRepository.find();
+
+    return records.reduce(
+      (acc, record) => {
+        acc.albums.push(...record.albums);
+        acc.artists.push(...record.artists);
+        acc.tracks.push(...record.tracks);
+        return acc;
+      },
+      {
+        albums: [],
+        artists: [],
+        tracks: [],
+      },
+    );
   }
 
   async addTrack(trackId: string): Promise<string> {
@@ -63,7 +76,7 @@ export class FavsService {
       return null;
     }
 
-    const isFavourite = this.favsRepository.findOneBy({
+    const isFavourite = await this.favsRepository.findOneBy({
       albums: { id: albumId },
     });
 
@@ -95,7 +108,7 @@ export class FavsService {
       return null;
     }
 
-    const isFavourite = this.favsRepository.findOneBy({
+    const isFavourite = await this.favsRepository.findOneBy({
       artists: { id: artistId },
     });
 

@@ -8,6 +8,7 @@ import { AbstractIdEntity } from '../../common/entities/abstract.entity';
 export class FavEntity extends AbstractIdEntity {
   @ManyToMany(() => ArtistEntity, (artist) => artist.favs, {
     cascade: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinTable()
@@ -15,6 +16,7 @@ export class FavEntity extends AbstractIdEntity {
 
   @ManyToMany(() => AlbumEntity, (album) => album.favs, {
     cascade: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinTable()
@@ -22,6 +24,7 @@ export class FavEntity extends AbstractIdEntity {
 
   @ManyToMany(() => TrackEntity, (track) => track.favs, {
     cascade: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinTable()

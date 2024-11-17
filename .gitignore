@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 
 pgdata
+postgres_logs

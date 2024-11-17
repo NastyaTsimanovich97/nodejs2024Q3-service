@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-// import { FavsService } from '../favs/favs.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
@@ -11,8 +10,6 @@ import { TrackEntity } from './entities/track.entity';
 @Injectable()
 export class TrackService {
   constructor(
-    // @Inject(forwardRef(() => FavsService))
-    // private readonly favsService: FavsService,
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
   ) {}

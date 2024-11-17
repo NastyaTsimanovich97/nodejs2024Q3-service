@@ -19,12 +19,9 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const date = new Date().getTime();
     const userData = {
       id: uuidv4(),
       version: 1,
-      createdAt: date,
-      updatedAt: date,
       ...createUserDto,
     };
 
@@ -58,7 +55,6 @@ export class UserService {
     const updatedUser = {
       ...updatedUserRecord,
       version: updatedUserRecord.version + 1,
-      updatedAt: new Date().getTime(),
       password: updateUserDto.newPassword,
     };
 
