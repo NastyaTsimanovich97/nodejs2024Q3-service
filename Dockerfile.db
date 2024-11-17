@@ -1,0 +1,17 @@
+# Use the official PostgreSQL image from the Docker Hub  
+FROM postgres:16 
+
+# Set environment variables for PostgreSQL  
+# You can customize these values as needed  
+ENV POSTGRES_USER=admin  
+ENV POSTGRES_PASSWORD=adminpassword  
+ENV POSTGRES_DB=library-service  
+
+# Expose the port PostgreSQL runs on  
+EXPOSE 5432  
+
+# Optional: If you have initialization scripts, copy them to the docker-entrypoint-initdb.d directory  
+# COPY init-scripts/ /docker-entrypoint-initdb.d/  
+
+# Run the PostgreSQL server  
+CMD ["postgres"]  
