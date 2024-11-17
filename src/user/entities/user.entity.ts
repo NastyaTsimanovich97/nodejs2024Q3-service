@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 
 import { AbstractEntity } from '../../common/entities/abstract.entity';
 
-@Entity('user')
+@Entity({ name: 'user' })
 export class UserEntity extends AbstractEntity {
   @Column({ unique: true })
   login: string;

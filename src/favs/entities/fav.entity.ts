@@ -4,7 +4,7 @@ import { ArtistEntity } from '../../artist/entities/artist.entity';
 import { TrackEntity } from '../../track/entities/track.entity';
 import { AbstractIdEntity } from '../../common/entities/abstract.entity';
 
-@Entity('fav')
+@Entity({ name: 'fav' })
 export class FavEntity extends AbstractIdEntity {
   @ManyToMany(() => ArtistEntity, (artist) => artist.favs, {
     cascade: true,

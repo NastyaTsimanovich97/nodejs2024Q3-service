@@ -4,7 +4,7 @@ import { AlbumEntity } from '../../album/entities/album.entity';
 import { TrackEntity } from '../../track/entities/track.entity';
 import { FavEntity } from '../../favs/entities/fav.entity';
 
-@Entity('artist')
+@Entity({ name: 'artist' })
 export class ArtistEntity extends AbstractEntity {
   @Column()
   name: string;

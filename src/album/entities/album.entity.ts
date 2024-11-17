@@ -12,7 +12,7 @@ import { ArtistEntity } from '../../artist/entities/artist.entity';
 import { TrackEntity } from '../../track/entities/track.entity';
 import { FavEntity } from '../../favs/entities/fav.entity';
 
-@Entity('album')
+@Entity({ name: 'album' })
 export class AlbumEntity extends AbstractIdEntity {
   @Column()
   name: string;
