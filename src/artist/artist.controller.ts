@@ -30,8 +30,8 @@ export class ArtistController {
   }
 
   @Get(':id')
-  getById(@Param() { id }: IdParamDto) {
-    const artist = this.artistService.getById(id);
+  async getById(@Param() { id }: IdParamDto) {
+    const artist = await this.artistService.getById(id);
 
     if (!artist) {
       throw new NotFoundException('Artist not found');

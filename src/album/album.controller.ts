@@ -30,8 +30,8 @@ export class AlbumController {
   }
 
   @Get(':id')
-  getById(@Param() { id }: IdParamDto) {
-    const album = this.albumService.getById(id);
+  async getById(@Param() { id }: IdParamDto) {
+    const album = await this.albumService.getById(id);
 
     if (!album) {
       throw new NotFoundException('Album not found');

@@ -22,8 +22,8 @@ export class FavsController {
   }
 
   @Post('track/:id')
-  addTrack(@Param() { id }: IdParamDto) {
-    const result = this.favsService.addTrack(id);
+  async addTrack(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.addTrack(id);
 
     if (!result) {
       throw new UnprocessableEntityException('Track not found');
@@ -34,8 +34,8 @@ export class FavsController {
 
   @Delete('track/:id')
   @HttpCode(204)
-  deleteTrack(@Param() { id }: IdParamDto) {
-    const result = this.favsService.deleteTrack(id);
+  async deleteTrack(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.deleteTrack(id);
 
     if (!result) {
       throw new NotFoundException('Track is not favorite');
@@ -45,8 +45,8 @@ export class FavsController {
   }
 
   @Post('album/:id')
-  addAlbum(@Param() { id }: IdParamDto) {
-    const result = this.favsService.addAlbum(id);
+  async addAlbum(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.addAlbum(id);
 
     if (!result) {
       throw new UnprocessableEntityException('Album not found');
@@ -57,8 +57,8 @@ export class FavsController {
 
   @Delete('album/:id')
   @HttpCode(204)
-  deleteAlbum(@Param() { id }: IdParamDto) {
-    const result = this.favsService.deleteAlbum(id);
+  async deleteAlbum(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.deleteAlbum(id);
 
     if (!result) {
       throw new NotFoundException('Album is not favorite');
@@ -68,8 +68,8 @@ export class FavsController {
   }
 
   @Post('artist/:id')
-  addArtist(@Param() { id }: IdParamDto) {
-    const result = this.favsService.addArtist(id);
+  async addArtist(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.addArtist(id);
 
     if (!result) {
       throw new UnprocessableEntityException('Artist not found');
@@ -80,8 +80,8 @@ export class FavsController {
 
   @Delete('artist/:id')
   @HttpCode(204)
-  deleteArtist(@Param() { id }: IdParamDto) {
-    const result = this.favsService.deleteArtist(id);
+  async deleteArtist(@Param() { id }: IdParamDto) {
+    const result = await this.favsService.deleteArtist(id);
 
     if (!result) {
       throw new NotFoundException('Artist is not favorite');

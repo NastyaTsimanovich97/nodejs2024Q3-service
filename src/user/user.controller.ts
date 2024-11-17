@@ -36,15 +36,15 @@ export class UserController {
   @Get()
   @UseInterceptors(ClassSerializerInterceptor)
   @SerializeOptions({ type: UserEntity })
-  getAll(): UserEntity[] {
+  getAll() {
     return this.userService.getAll();
   }
 
   @Get(':id')
   @UseInterceptors(ClassSerializerInterceptor)
   @SerializeOptions({ type: UserEntity })
-  getById(@Param() { id }: IdParamDto) {
-    const user = this.userService.getById(id);
+  async getById(@Param() { id }: IdParamDto) {
+    const user = await this.userService.getById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
