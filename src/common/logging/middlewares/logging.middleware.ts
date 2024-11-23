@@ -8,14 +8,14 @@ export class LoggingMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     const { url, query, body, method } = req;
-    const originalSend = res.send.bind(res);  
-    
-    let responseBody: any;  
+    const originalSend = res.send.bind(res);
 
-    res.send = function (data: any) {  
-      responseBody = data; // Store the response data  
-      return originalSend(data); // Call the original send method  
-    };  
+    let responseBody: any;
+
+    res.send = function (data: any) {
+      responseBody = data; // Store the response data
+      return originalSend(data); // Call the original send method
+    };
 
     // Log the incoming request
     this.loggingService.log(`[Request] ${method} ${url}`);
