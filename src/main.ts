@@ -24,6 +24,7 @@ async function bootstrap() {
   app.useGlobalFilters(new InternalExceptionFilter());
 
   const docs = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('Home Library Service')
     .setDescription('Home Library API service')
     .setVersion('0.1')

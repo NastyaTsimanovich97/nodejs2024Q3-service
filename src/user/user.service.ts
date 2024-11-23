@@ -18,7 +18,7 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
     const userData = {
       id: uuidv4(),
       version: 1,
@@ -40,6 +40,10 @@ export class UserService {
 
   async getById(id: string): Promise<UserEntity> {
     return this.userRepository.findOneBy({ id });
+  }
+
+  async getByLogin(login: string): Promise<UserEntity> {
+    return this.userRepository.findOneBy({ login });
   }
 
   async update(id: string, updateUserDto: UpdatePasswordDto) {

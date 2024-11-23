@@ -8,14 +8,19 @@ import {
   NotFoundException,
   Put,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { IdParamDto } from '../common/dto/idParam.dto';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Controller('album')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 

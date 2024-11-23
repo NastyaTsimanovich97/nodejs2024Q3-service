@@ -11,10 +11,12 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { IdParamDto } from '../common/dto/idParam.dto';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,6 +24,8 @@ import { UpdatePasswordDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 
 @Controller('user')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
