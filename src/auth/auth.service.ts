@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -54,14 +54,38 @@ export class AuthService {
   }
 
   async refresh(refreshTokenDto: RefreshTokenDto): Promise<TokensDto> {
-    const accessToken = '';
-    const refreshToken = '';
+    const { refreshToken } = refreshTokenDto;
 
-    return { accessToken, refreshToken };
+    let userId;
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.refreshSecret,
+      });
+
+      userId = payload.userId;
+    } catch (error) {
+      throw new UnauthorizedException(
+        `Authentication token is not valid. ${error.message}`,
+      );
+    }
+
+    const user = await this.userService.getById(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const payload = {
+      userId: user.id,
+      login: user.login,
+    };
+    const accessToken = await this.generateAccessToken(payload);
+    const updatedRefreshToken = await this.generateRefreshToken(payload);
+
+    return { accessToken, refreshToken: updatedRefreshToken };
   }
 
   private generateAccessToken(payload: PayloadDto): Promise<string> {
-    console.log('this.expiresIn', this.expiresIn);
     return this.jwtService.signAsync(payload, {
       secret: this.secret,
       expiresIn: this.expiresIn,
