@@ -5,11 +5,14 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 
+import { ConfigModule } from '@nestjs/config';
+
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { LoggingService } from './services/logging.service';
 
 @Global()
 @Module({
+  imports: [ConfigModule],
   providers: [LoggingService],
   exports: [LoggingService],
 })

@@ -4,10 +4,24 @@ import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { InternalExceptionFilter } from './common/filters/exception.filter';
+import { LoggingService } from './common/logging/services/logging.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  const loggingService = app.get(LoggingService);
+
+  process.on('uncaughtException', (error) => {
+    loggingService.error(`Uncaught Exception: ${error.message}`, error.stack);
+    process.exit(1);
+  });
+  process.on('unhandledRejection', (reason) => {
+    loggingService.error(`Unhandled Rejection: ${reason}`);
+  });
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalFilters(new InternalExceptionFilter());
 
   const docs = new DocumentBuilder()
     .setTitle('Home Library Service')
@@ -17,9 +31,6 @@ async function bootstrap() {
 
   const documentFactory = () => SwaggerModule.createDocument(app, docs);
   SwaggerModule.setup('doc', app, documentFactory);
-
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.useGlobalFilters(new InternalExceptionFilter());
 
   await app.listen(configService.get('port'));
 }
