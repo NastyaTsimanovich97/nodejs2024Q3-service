@@ -7,12 +7,16 @@ import {
   SerializeOptions,
   ForbiddenException,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
+
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login-auth.dto';
 import { UserEntity } from '../user/entities/user.entity';
 import { RefreshTokenDto } from './dto/tokens.dto';
+import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,11 +41,30 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     if (!refreshTokenDto.refreshToken) {
       throw new UnauthorizedException('Refresh token is not provided');
     }
 
-    return this.authService.refresh(refreshTokenDto);
+    const { refreshToken } = refreshTokenDto;
+
+    let userId;
+    try {
+      userId = await this.authService.verifyRefreshToken(refreshToken);
+    } catch (error) {
+      throw new UnauthorizedException(
+        `Authentication token is not valid. ${error.message}`,
+      );
+    }
+
+    const respose = await this.authService.refresh(userId);
+
+    if (!respose) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return respose;
   }
 }

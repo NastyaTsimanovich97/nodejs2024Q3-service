@@ -23,7 +23,8 @@ export class InternalExceptionFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = exception?.message || INTERNAL_SERVER_ERROR;
+    const message =
+      exception?.getResponse?.() || exception?.message || INTERNAL_SERVER_ERROR;
 
     response.status(status).json({
       statusCode: status,
