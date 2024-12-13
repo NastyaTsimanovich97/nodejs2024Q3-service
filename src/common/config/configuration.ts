@@ -3,6 +3,9 @@ const DEFAULT_PORT = 3000;
 export default () =>
   ({
     port: parseInt(process.env.PORT, 10) || DEFAULT_PORT,
+    logging: {
+      level: process.env.LOG_LEVEL || 'log',
+    },
     database: {
       type: 'postgres' as const,
       host: process.env.POSTGRES_HOST,
@@ -20,5 +23,12 @@ export default () =>
         migrationsDir: 'migrations',
       },
       logging: false,
+    },
+    auth: {
+      salt: parseInt(process.env.SALT, 10),
+      secret: process.env.JWT_SECRET_KEY,
+      refreshSecret: process.env.JWT_SECRET_REFRESH_KEY,
+      expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      refreshExpiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
     },
   } as const);

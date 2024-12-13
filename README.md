@@ -14,6 +14,8 @@ git clone [{repository URL}](https://github.com/NastyaTsimanovich97/nodejs2024Q3
 
 ## Running application in docker
 
+Create .env file in the root and copy .env.example to .env
+
 Build docker containers
 ```
 docker-compose build --no-cache
@@ -23,6 +25,8 @@ Run docker containers
 ```
 docker-compose up
 ```
+
+Create DB server in pgAdmin with credentials and values from .env file
 
 Run DB migration in APPLICATION container terminal
 ```

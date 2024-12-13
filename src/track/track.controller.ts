@@ -8,14 +8,19 @@ import {
   Delete,
   NotFoundException,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { IdParamDto } from '../common/dto/idParam.dto';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('track')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 

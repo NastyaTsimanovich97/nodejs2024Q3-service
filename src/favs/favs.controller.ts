@@ -7,12 +7,17 @@ import {
   UnprocessableEntityException,
   NotFoundException,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { IdParamDto } from '../common/dto/idParam.dto';
 import { FavsService } from './favs.service';
 
 @Controller('favs')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 

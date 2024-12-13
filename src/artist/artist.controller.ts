@@ -8,14 +8,19 @@ import {
   NotFoundException,
   Put,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { IdParamDto } from '../common/dto/idParam.dto';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
