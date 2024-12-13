@@ -1,56 +1,46 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { FavsService } from '../favs/favs.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackEntity } from './entities/track.entity';
+import { FavsService } from '../favs/favs.service';
 
 @Injectable()
 export class TrackService {
   constructor(
     @Inject(forwardRef(() => FavsService))
-    private readonly favsService: FavsService,
+    private favsService: FavsService,
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
   ) {}
 
-  private tracks: TrackEntity[] = [
-    {
-      id: '68b2123c-4a20-4138-9d00-4f89eb06d5ac',
-      name: 'Любовь не пропала',
-      albumId: '18b2123c-4a20-4138-9d00-4f89eb06d5ac',
-      artistId: '8cd4e165-954c-4268-ad5c-0f13ba0188ec',
-      duration: 360,
-    },
-    {
-      id: '68b2123c-4a20-4138-9d00-4f89eb06d5ac',
-      name: 'Miss you',
-      albumId: '48b2123c-4a20-4138-9d00-4f89eb06d5ac',
-      artistId: 'c3f9f2a5-9f9e-4e9d-9e9d-9f9e4e9d2a5c',
-      duration: 289,
-    },
-  ];
-
-  create(createTrackDto: CreateTrackDto): TrackEntity {
+  async create(createTrackDto: CreateTrackDto): Promise<TrackEntity> {
     const newTrack: TrackEntity = {
       id: uuidv4(),
       ...createTrackDto,
     };
 
-    this.tracks.push(newTrack);
+    await this.trackRepository.save(newTrack);
 
     return newTrack;
   }
 
-  getAll(): TrackEntity[] {
-    return this.tracks;
+  async getAll(): Promise<TrackEntity[]> {
+    return this.trackRepository.find();
   }
 
-  getById(id: string): TrackEntity {
-    return this.tracks.find((track) => track.id === id);
+  async getById(id: string): Promise<TrackEntity> {
+    return this.trackRepository.findOneBy({ id });
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto): TrackEntity | null {
-    const trackRecord = this.getById(id);
+  async update(
+    id: string,
+    updateTrackDto: UpdateTrackDto,
+  ): Promise<TrackEntity | null> {
+    const trackRecord = await this.getById(id);
 
     if (!trackRecord) {
       return null;
@@ -61,43 +51,40 @@ export class TrackService {
       ...updateTrackDto,
     };
 
-    this.tracks = this.tracks.map((track) =>
-      track.id === id ? updatedTrack : track,
-    );
+    await this.trackRepository.update({ id }, updatedTrack);
 
     return updatedTrack;
   }
 
-  delete(id: string): string | null {
-    const trackRecord = this.getById(id);
+  async delete(id: string): Promise<string | null> {
+    const trackRecord = await this.getById(id);
 
     if (!trackRecord) {
       return null;
     }
 
-    this.tracks = this.tracks.filter((track) => track.id !== id);
-
-    this.favsService.deleteTrack(id);
+    await this.favsService.deleteTrack(id);
+    await this.trackRepository.delete({ id });
 
     return `Track ${id} is removed`;
   }
 
-  deleteByArtistId(artistId: string): void {
-    this.tracks = this.tracks.map((track) => {
-      if (track.artistId === artistId) {
-        return { ...track, artistId: null };
-      }
+  // deleteByArtistId(artistId: string): void {
+  //   this.tracks = this.tracks.map((track) => {
+  //     if (track.artistId === artistId) {
+  //       return { ...track, artistId: null };
+  //     }
 
-      return track;
-    });
-  }
+  //     return track;
+  //   });
+  // }
 
-  deleteByAlbumId(albumId: string): void {
-    this.tracks = this.tracks.map((track) => {
-      if (track.albumId === albumId) {
-        return { ...track, albumId: null };
-      }
-      return track;
-    });
-  }
+  // deleteByAlbumId(albumId: string): void {
+  //   this.tracks = this.tracks.map((track) => {
+  //     if (track.albumId === albumId) {
+  //       return { ...track, albumId: null };
+  //     }
+  //     return track;
+  //   });
+  // }
 }

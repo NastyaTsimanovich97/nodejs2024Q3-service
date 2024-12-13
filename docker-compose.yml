@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_logs:/var/log/postgresql
+    networks:
+      - my-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/usr/src/app/src  # Sync the src folder for hot-reloading
+    ports:
+      - "4000:4000"  # Map the container port to host
+    networks:  
+      - my-network  
+    depends_on:
+      - postgres
+
+  pgadmin:
+    image: dpage/pgadmin4  # Use pgAdmin image from Docker Hub  
+    ports:  
+      - "5050:80"  # Map pgAdmin port to host  
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=pgadmin4
+    depends_on:
+      - postgres
+    networks:  
+      - my-network  
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

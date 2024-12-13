@@ -30,8 +30,8 @@ export class TrackController {
   }
 
   @Get(':id')
-  getById(@Param() { id }: IdParamDto) {
-    const result = this.trackService.getById(id);
+  async getById(@Param() { id }: IdParamDto) {
+    const result = await this.trackService.getById(id);
 
     if (!result) {
       throw new NotFoundException('Track not found');
@@ -41,8 +41,11 @@ export class TrackController {
   }
 
   @Put(':id')
-  update(@Param() { id }: IdParamDto, @Body() updateTrackDto: UpdateTrackDto) {
-    const result = this.trackService.update(id, updateTrackDto);
+  async update(
+    @Param() { id }: IdParamDto,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
+    const result = await this.trackService.update(id, updateTrackDto);
 
     if (!result) {
       throw new NotFoundException('Track not found');
@@ -53,8 +56,8 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(204)
-  delete(@Param() { id }: IdParamDto) {
-    const result = this.trackService.delete(id);
+  async delete(@Param() { id }: IdParamDto) {
+    const result = await this.trackService.delete(id);
 
     if (!result) {
       throw new NotFoundException('Track not found');

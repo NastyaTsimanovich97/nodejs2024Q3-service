@@ -12,6 +12,29 @@
 git clone [{repository URL}](https://github.com/NastyaTsimanovich97/nodejs2024Q3-service.git)
 ```
 
+## Running application in docker
+
+Build docker containers
+```
+docker-compose build --no-cache
+```
+
+Run docker containers
+```
+docker-compose up
+```
+
+Run DB migration in APPLICATION container terminal
+```
+npm run migration:run
+```
+
+Service docs
+http://localhost:4000/doc
+
+PgAdmin
+http://localhost:5050/browser/
+
 ## Installing NPM modules
 
 ```

@@ -1,13 +1,17 @@
 import { Exclude } from 'class-transformer';
+import { Column, Entity } from 'typeorm';
 
-export class UserEntity {
-  id: string; // uuid v4
+import { AbstractEntity } from '../../common/entities/abstract.entity';
+
+@Entity({ name: 'user' })
+export class UserEntity extends AbstractEntity {
+  @Column()
   login: string;
 
   @Exclude({ toPlainOnly: true })
+  @Column()
   password: string;
 
+  @Column({ default: 1 })
   version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
 }

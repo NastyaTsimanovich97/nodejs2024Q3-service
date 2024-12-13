@@ -3,6 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
@@ -10,42 +13,37 @@ import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  private users: UserEntity[] = [
-    {
-      id: '4786ec93-59f9-46f4-a2b7-59913cf749e0',
-      login: 'admin',
-      password: 'admin',
-      version: 1,
-      createdAt: 1731154017532,
-      updatedAt: 1731154017532,
-    },
-  ];
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
 
-  create(createUserDto: CreateUserDto): UserEntity {
-    const date = new Date().getTime();
+  async create(createUserDto: CreateUserDto) {
     const userData = {
       id: uuidv4(),
       version: 1,
-      createdAt: date,
-      updatedAt: date,
       ...createUserDto,
     };
 
-    this.users.push(userData);
+    const user = await this.userRepository.save(userData);
 
-    return userData;
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 
-  getAll(): UserEntity[] {
-    return this.users;
+  async getAll(): Promise<UserEntity[]> {
+    return this.userRepository.find();
   }
 
-  getById(id: string): UserEntity {
-    return this.users.find((user) => user.id === id);
+  async getById(id: string): Promise<UserEntity> {
+    return this.userRepository.findOneBy({ id });
   }
 
-  update(id: string, updateUserDto: UpdatePasswordDto): UserEntity {
-    const updatedUserRecord = this.getById(id);
+  async update(id: string, updateUserDto: UpdatePasswordDto) {
+    const updatedUserRecord = await this.getById(id);
 
     if (!updatedUserRecord) {
       throw new NotFoundException('User not found');
@@ -55,28 +53,32 @@ export class UserService {
       throw new ForbiddenException('Password is not correct');
     }
 
-    const updatedUser = {
+    const updatedUserData = {
       ...updatedUserRecord,
+      updatedAt: new Date(),
       version: updatedUserRecord.version + 1,
-      updatedAt: new Date().getTime(),
       password: updateUserDto.newPassword,
     };
 
-    this.users = this.users.map((user) =>
-      user.id === id ? updatedUser : user,
-    );
+    await this.userRepository.update({ id }, updatedUserData);
 
-    return updatedUser;
+    const updatedUser = await this.getById(id);
+
+    return {
+      ...updatedUser,
+      createdAt: new Date(updatedUser.createdAt).getTime(),
+      updatedAt: new Date(updatedUser.updatedAt).getTime(),
+    };
   }
 
-  delete(id: string): string {
-    const removedUserRecord = this.getById(id);
+  async delete(id: string): Promise<string> {
+    const removedUserRecord = await this.getById(id);
 
     if (!removedUserRecord) {
       throw new NotFoundException('User not found');
     }
 
-    this.users = this.users.filter((user) => user.id !== id);
+    await this.userRepository.delete({ id });
 
     return `User ${id} is removed`;
   }
